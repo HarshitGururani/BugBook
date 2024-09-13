@@ -49,7 +49,6 @@ export function Notification({ notification }: NotificationProps) {
         <div className="space-y-3">
           <UserAvatar avatarUrl={notification.issuer.avatarUrl} size={36} />
           <div>
-            <span className="font-bold">{notification.issuer.displayName}</span>{" "}
             <span>{message}</span>
           </div>
           {notification.post && (
