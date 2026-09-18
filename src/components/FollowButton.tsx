@@ -1,5 +1,6 @@
 "use client";
 
+import { useRequireAuth } from "@/components/AuthRequiredDialog";
 import useFollowerInfo from "@/hooks/useFollowerInfo";
 import kyInstance from "@/lib/ky";
 import { FollowerInfo } from "@/lib/types";
@@ -17,6 +18,7 @@ export default function FollowButton({
   initialState,
 }: FollowButtonProps) {
   const { toast } = useToast();
+  const requireAuth = useRequireAuth();
 
   const queryClient = useQueryClient();
 
@@ -56,7 +58,10 @@ export default function FollowButton({
   return (
     <Button
       variant={data.isFollowedByUser ? "secondary" : "default"}
-      onClick={() => mutate()}
+      onClick={() => {
+        if (!requireAuth("follow people")) return;
+        mutate();
+      }}
     >
       {data.isFollowedByUser ? "Unfollow" : "Follow"}
     </Button>

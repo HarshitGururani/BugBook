@@ -9,10 +9,6 @@ export async function GET(
   try {
     const { user: loggedInUser } = await validateRequest();
 
-    if (!loggedInUser) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const user = await prisma.user.findFirst({
       where: {
         username: {
@@ -20,7 +16,7 @@ export async function GET(
           mode: "insensitive",
         },
       },
-      select: getUserDataSelect(loggedInUser.id),
+      select: getUserDataSelect(loggedInUser?.id),
     });
 
     if (!user) {

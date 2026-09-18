@@ -1,6 +1,7 @@
 "use client";
 
 import { useSession } from "@/app/(main)/SessionProvider";
+import { useRequireAuth } from "@/components/AuthRequiredDialog";
 import LoadingButton from "@/components/LoadingButton";
 import { Button } from "@/components/ui/button";
 import UserAvatar from "@/components/UserAvatar";
@@ -18,6 +19,7 @@ import useMediaUpload, { Attachment } from "./useMediaUpload";
 
 export default function PostEditor() {
   const { user } = useSession();
+  const requireAuth = useRequireAuth();
 
   const mutation = useSubmitPostMutation();
 
@@ -53,6 +55,21 @@ export default function PostEditor() {
     editor?.getText({
       blockSeparator: "\n",
     }) || "";
+
+  if (!user) {
+    return (
+      <button
+        type="button"
+        onClick={() => requireAuth("post")}
+        className="flex w-full gap-5 rounded-2xl bg-card p-5 text-left shadow-sm"
+      >
+        <UserAvatar avatarUrl={null} className="hidden sm:inline" />
+        <div className="w-full rounded-2xl bg-background px-5 py-3 text-muted-foreground">
+          What&apos;s crack-a-lackin&apos;? Create an account to post.
+        </div>
+      </button>
+    );
+  }
 
   function onSubmit() {
     mutation.mutate(

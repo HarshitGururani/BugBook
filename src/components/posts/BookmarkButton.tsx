@@ -1,3 +1,4 @@
+import { useRequireAuth } from "@/components/AuthRequiredDialog";
 import kyInstance from "@/lib/ky";
 import { BookmarkInfo } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,7 @@ export default function BookmarkButton({
   initialState,
 }: BookmarkButtonProps) {
   const { toast } = useToast();
+  const requireAuth = useRequireAuth();
 
   const queryClient = useQueryClient();
 
@@ -64,7 +66,13 @@ export default function BookmarkButton({
   });
 
   return (
-    <button onClick={() => mutate()} className="flex items-center gap-2">
+    <button
+      onClick={() => {
+        if (!requireAuth("bookmark posts")) return;
+        mutate();
+      }}
+      className="flex items-center gap-2"
+    >
       <Bookmark
         className={cn(
           "size-5",

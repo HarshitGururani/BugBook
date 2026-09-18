@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Check, LogOutIcon, Monitor, Moon, Sun, UserIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
+import { Button } from "./ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -31,6 +32,22 @@ export default function UserButton({ className }: UserButtonProps) {
   const { theme, setTheme } = useTheme();
 
   const queryClient = useQueryClient();
+
+  if (!user) {
+    return (
+      <div className={cn("flex items-center gap-2 sm:ms-auto", className)}>
+        <Link
+          href="/login"
+          className="text-sm font-medium text-muted-foreground hover:underline"
+        >
+          Log in
+        </Link>
+        <Button asChild size="sm">
+          <Link href="/signup">Sign up</Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <DropdownMenu>

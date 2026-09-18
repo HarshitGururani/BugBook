@@ -39,11 +39,12 @@ export default function NewChatDialog({
 
   const { data, isFetching, isError, isSuccess } = useQuery({
     queryKey: ["stream-users", seacrhInputDebounced],
+    enabled: !!loggedInUser,
     queryFn: async () =>
       client.queryUsers(
         {
           id: {
-            $ne: loggedInUser.id,
+            $ne: loggedInUser!.id,
           },
           role: { $ne: "admin" },
           ...(seacrhInputDebounced
@@ -63,10 +64,10 @@ export default function NewChatDialog({
   const mutation = useMutation({
     mutationFn: async () => {
       const channel = client.channel("messaging", {
-        members: [loggedInUser.id, ...selectedUsers.map((user) => user.id)],
+        members: [loggedInUser!.id, ...selectedUsers.map((user) => user.id)],
         name:
           selectedUsers.length > 1
-            ? loggedInUser.displayName +
+            ? loggedInUser!.displayName +
               ", " +
               selectedUsers.map((u) => u.name).join(", ")
             : undefined,

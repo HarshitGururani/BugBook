@@ -16,7 +16,7 @@ interface PageProps {
   params: { postId: string };
 }
 
-const getPost = cache(async (postId: string, loggedInUserId: string) => {
+const getPost = cache(async (postId: string, loggedInUserId?: string | null) => {
   const post = await prisma.post.findUnique({
     where: {
       id: postId,
@@ -34,9 +34,7 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { user } = await validateRequest();
 
-  if (!user) return {};
-
-  const post = await getPost(postId, user.id);
+  const post = await getPost(postId, user?.id);
 
   return {
     title: `${post.user.displayName}: ${post.content.slice(0, 50)}...`,
@@ -46,15 +44,7 @@ export async function generateMetadata({
 export default async function Page({ params: { postId } }: PageProps) {
   const { user } = await validateRequest();
 
-  if (!user) {
-    return (
-      <p className="text-destructive">
-        You&apos;re not authorized to view this page.
-      </p>
-    );
-  }
-
-  const post = await getPost(postId, user.id);
+  const post = await getPost(postId, user?.id);
 
   return (
     <main className="flex w-full min-w-0 gap-5">
@@ -76,8 +66,6 @@ interface UserInfoSidebarProps {
 
 async function UserInfoSidebar({ user }: UserInfoSidebarProps) {
   const { user: loggedInUser } = await validateRequest();
-
-  if (!loggedInUser) return null;
 
   return (
     <div className="space-y-5 rounded-2xl bg-card p-5 shadow-sm">
@@ -103,12 +91,12 @@ async function UserInfoSidebar({ user }: UserInfoSidebarProps) {
           {user.bio}
         </div>
       </Linkify>
-      {user.id !== loggedInUser.id && (
+      {(!loggedInUser || user.id !== loggedInUser.id) && (
         <FollowButton
           userId={user.id}
           initialState={{
             followers: user._count.followers,
-            isFollowedByUser: user.followers.some(
+            isFollowedByUser: !!loggedInUser && user.followers.some(
               ({ followerId }) => followerId === loggedInUser.id,
             ),
           }}

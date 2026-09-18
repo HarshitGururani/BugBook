@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "@/app/(main)/SessionProvider";
 import { Button } from "@/components/ui/button";
 import kyInstance from "@/lib/ky";
 import { MessageCountInfo } from "@/lib/types";
@@ -12,12 +13,15 @@ interface MessagesButtonProps {
 }
 
 export default function MessagesButton({ initialState }: MessagesButtonProps) {
+  const { user } = useSession();
+
   const { data } = useQuery({
     queryKey: ["unread-messages-count"],
     queryFn: () =>
       kyInstance.get("/api/messages/unread-count").json<MessageCountInfo>(),
     initialData: initialState,
-    refetchInterval: 60 * 1000,
+    enabled: !!user,
+    refetchInterval: user ? 60 * 1000 : false,
   });
 
   return (

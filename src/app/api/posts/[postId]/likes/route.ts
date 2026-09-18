@@ -9,16 +9,12 @@ export async function GET(
   try {
     const { user: loggedInUser } = await validateRequest();
 
-    if (!loggedInUser) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const post = await prisma.post.findUnique({
       where: { id: postId },
       select: {
         likes: {
           where: {
-            userId: loggedInUser.id,
+            userId: loggedInUser?.id ?? "",
           },
           select: {
             userId: true,

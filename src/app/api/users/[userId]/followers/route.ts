@@ -9,16 +9,12 @@ export async function GET(
   try {
     const { user: loggedInUser } = await validateRequest();
 
-    if (!loggedInUser) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const user = await prisma.user.findUnique({
       where: { id: userId },
       select: {
         followers: {
           where: {
-            followerId: loggedInUser.id,
+            followerId: loggedInUser?.id ?? "",
           },
           select: {
             followerId: true,

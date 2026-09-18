@@ -18,7 +18,7 @@ interface PageProps {
   params: { username: string };
 }
 
-const getUser = cache(async (username: string, loggedInUserId: string) => {
+const getUser = cache(async (username: string, loggedInUserId?: string | null) => {
   const user = await prisma.user.findFirst({
     where: {
       username: {
@@ -39,9 +39,7 @@ export async function generateMetadata({
 }: PageProps): Promise<Metadata> {
   const { user: loggedInUser } = await validateRequest();
 
-  if (!loggedInUser) return {};
-
-  const user = await getUser(username, loggedInUser.id);
+  const user = await getUser(username, loggedInUser?.id);
 
   return {
     title: `${user.displayName} (@${user.username})`,
@@ -51,20 +49,12 @@ export async function generateMetadata({
 export default async function Page({ params: { username } }: PageProps) {
   const { user: loggedInUser } = await validateRequest();
 
-  if (!loggedInUser) {
-    return (
-      <p className="text-destructive">
-        You&apos;re not authorized to view this page.
-      </p>
-    );
-  }
-
-  const user = await getUser(username, loggedInUser.id);
+  const user = await getUser(username, loggedInUser?.id);
 
   return (
     <main className="flex w-full min-w-0 gap-5">
       <div className="w-full min-w-0 space-y-5">
-        <UserProfile user={user} loggedInUserId={loggedInUser.id} />
+        <UserProfile user={user} loggedInUserId={loggedInUser?.id ?? null} />
         <div className="rounded-2xl bg-card p-5 shadow-sm">
           <h2 className="text-center text-2xl font-bold">
             {user.displayName}&apos;s posts
@@ -79,13 +69,13 @@ export default async function Page({ params: { username } }: PageProps) {
 
 interface UserProfileProps {
   user: UserData;
-  loggedInUserId: string;
+  loggedInUserId: string | null;
 }
 
 async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
   const followerInfo: FollowerInfo = {
     followers: user._count.followers,
-    isFollowedByUser: user.followers.some(
+    isFollowedByUser: !!loggedInUserId && user.followers.some(
       ({ followerId }) => followerId === loggedInUserId,
     ),
   };
@@ -114,7 +104,7 @@ async function UserProfile({ user, loggedInUserId }: UserProfileProps) {
             <FollowerCount userId={user.id} initialState={followerInfo} />
           </div>
         </div>
-        {user.id === loggedInUserId ? (
+        {loggedInUserId && user.id === loggedInUserId ? (
           <EditProfileButton user={user} />
         ) : (
           <FollowButton userId={user.id} initialState={followerInfo} />

@@ -1,5 +1,6 @@
 "use client";
 
+import { useSession } from "@/app/(main)/SessionProvider";
 import { Button } from "@/components/ui/button";
 import kyInstance from "@/lib/ky";
 import { NotificationCountInfo } from "@/lib/types";
@@ -14,6 +15,8 @@ interface NotificationButtonProps {
 export default function NotificationButton({
   initialState,
 }: NotificationButtonProps) {
+  const { user } = useSession();
+
   const { data } = useQuery({
     queryKey: ["unread-notification-count"],
     queryFn: () =>
@@ -21,7 +24,8 @@ export default function NotificationButton({
         .get("/api/notifications/unread-count")
         .json<NotificationCountInfo>(),
     initialData: initialState,
-    refetchInterval: 60 * 1000,
+    enabled: !!user,
+    refetchInterval: user ? 60 * 1000 : false,
   });
 
   return (

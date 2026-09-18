@@ -10,7 +10,8 @@ export async function GET(
     const { user: loggedInUser } = await validateRequest();
 
     if (!loggedInUser) {
-      return Response.json({ error: "Unauthorized" }, { status: 401 });
+      const data: BookmarkInfo = { isBookmarkedByUser: false };
+      return Response.json(data);
     }
 
     const bookmark = await prisma.bookmark.findUnique({

@@ -43,6 +43,8 @@ const ChatSideBar = ({ onClose, open }: ChatSideBarProps) => {
     [onClose],
   );
 
+  if (!user) return null;
+
   return (
     <div
       className={cn(

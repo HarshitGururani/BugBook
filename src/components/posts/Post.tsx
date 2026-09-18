@@ -52,7 +52,7 @@ export default function Post({ post }: PostProps) {
             </Link>
           </div>
         </div>
-        {post.user.id === user.id && (
+        {post.user.id === user?.id && (
           <PostMoreButton
             post={post}
             className="opacity-100 transition-opacity sm:opacity-0 sm:group-hover/post:opacity-100"
@@ -72,7 +72,7 @@ export default function Post({ post }: PostProps) {
             postId={post.id}
             initialState={{
               likes: post._count.likes,
-              isLikedByUser: post.likes.some((like) => like.userId === user.id),
+              isLikedByUser: !!user && post.likes.some((like) => like.userId === user.id),
             }}
           />
           <CommentButton
@@ -83,9 +83,9 @@ export default function Post({ post }: PostProps) {
         <BookmarkButton
           postId={post.id}
           initialState={{
-            isBookmarkedByUser: post.bookmarks.some(
-              (bookmark) => bookmark.userId === user.id,
-            ),
+            isBookmarkedByUser:
+              !!user &&
+              post.bookmarks.some((bookmark) => bookmark.userId === user.id),
           }}
         />
       </div>

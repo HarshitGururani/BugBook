@@ -1,7 +1,7 @@
 import { validateRequest } from "@/auth";
 import { Button } from "@/components/ui/button";
 import prisma from "@/lib/prisma";
-import { Bell, Bookmark, Home, Mail } from "lucide-react";
+import { Bookmark, Home } from "lucide-react";
 import Link from "next/link";
 import NotificationButton from "./NotificationButton";
 import MessagesButton from "./MessagesButton";
@@ -13,16 +13,18 @@ interface MenuBarProps {
 
 export default async function MenuBar({ className }: MenuBarProps) {
   const { user } = await validateRequest();
-  if (!user) return null;
-  const [unreadNotifactionCount, unreadMessagesCount] = await Promise.all([
-    prisma.notification.count({
-      where: {
-        recipientId: user.id,
-        read: false,
-      },
-    }),
-    (await streamServerClient.getUnreadCount(user.id)).total_unread_count,
-  ]);
+
+  const [unreadNotifactionCount, unreadMessagesCount] = user
+    ? await Promise.all([
+        prisma.notification.count({
+          where: {
+            recipientId: user.id,
+            read: false,
+          },
+        }),
+        (await streamServerClient.getUnreadCount(user.id)).total_unread_count,
+      ])
+    : [0, 0];
 
   return (
     <div className={className}>

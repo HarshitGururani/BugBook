@@ -24,22 +24,24 @@ export default function TrendsSidebar() {
 async function WhoToFollow() {
   const { user } = await validateRequest();
 
-  if (!user) return null;
-
   const usersToFollow = await prisma.user.findMany({
-    where: {
-      NOT: {
-        id: user.id,
-      },
-      followers: {
-        none: {
-          followerId: user.id,
-        },
-      },
-    },
-    select: getUserDataSelect(user.id),
+    where: user
+      ? {
+          NOT: {
+            id: user.id,
+          },
+          followers: {
+            none: {
+              followerId: user.id,
+            },
+          },
+        }
+      : undefined,
+    select: getUserDataSelect(user?.id),
     take: 5,
   });
+
+  if (!usersToFollow.length) return null;
 
   return (
     <div className="space-y-5 rounded-2xl bg-card p-5 shadow-sm">

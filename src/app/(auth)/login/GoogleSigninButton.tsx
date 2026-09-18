@@ -7,7 +7,7 @@ const GoogleSigninButton = () => {
       variant={"outline"}
       asChild
     >
-      <a href={"login/google"} className="flex w-full items-center gap-3">
+      <a href="/login/google" className="flex w-full items-center gap-3">
         <GoogleIcon />
         Sign in with Google
       </a>
