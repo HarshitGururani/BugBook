@@ -1,4 +1,4 @@
-import { google, lucia } from "@/auth";
+import { getGoogleClient, lucia } from "@/auth";
 import kyInstance from "@/lib/ky";
 import prisma from "@/lib/prisma";
 import streamServerClient from "@/lib/stream";
@@ -6,7 +6,6 @@ import { slugify } from "@/lib/utils";
 import { OAuth2RequestError } from "arctic";
 import { generateIdFromEntropySize } from "lucia";
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -27,6 +26,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const google = getGoogleClient();
     const tokens = await google.validateAuthorizationCode(
       code,
       storedCodeVerifier,

@@ -1,10 +1,11 @@
-import { google } from "@/auth";
+import { getGoogleClient } from "@/auth";
 import { generateCodeVerifier, generateState } from "arctic";
 import { cookies } from "next/headers";
 
 export async function GET() {
   const state = generateState();
   const codeVerifier = generateCodeVerifier();
+  const google = getGoogleClient();
 
   const url = await google.createAuthorizationURL(state, codeVerifier, {
     scopes: ["profile", "email"],

@@ -40,22 +40,35 @@ interface DatabaseUserAttributes {
   googleId: string | null;
 }
 
-function getBaseUrl() {
-  const configured = process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "");
-  const isLocalhost = !configured || configured.includes("localhost");
+const PRODUCTION_ORIGIN = "https://bug-book-ten.vercel.app";
 
-  if (process.env.VERCEL_URL && isLocalhost) {
-    return `https://${process.env.VERCEL_URL}`;
+export function getAuthOrigin() {
+  const configured = process.env.NEXT_PUBLIC_BASE_URL?.replace(/\/$/, "");
+
+  if (process.env.VERCEL_ENV === "production") {
+    if (configured && !configured.includes("localhost")) {
+      return configured;
+    }
+
+    const vercelProduction = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+    if (vercelProduction) {
+      return `https://${vercelProduction.replace(/^https?:\/\//, "")}`;
+    }
+
+    return PRODUCTION_ORIGIN;
   }
 
   return configured || "http://localhost:3000";
 }
 
-export const google = new Google(
-  process.env.GOOGLE_CLIENT_ID!,
-  process.env.GOOGLE_CLIENT_SECRET!,
-  `${getBaseUrl()}/api/auth/callback/google`,
-);
+export function getGoogleClient(origin = getAuthOrigin()) {
+  const base = origin.replace(/\/$/, "");
+  return new Google(
+    process.env.GOOGLE_CLIENT_ID!,
+    process.env.GOOGLE_CLIENT_SECRET!,
+    `${base}/api/auth/callback/google`,
+  );
+}
 
 export const validateRequest = cache(
   async (): Promise<
