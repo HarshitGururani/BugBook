@@ -30,12 +30,15 @@ export async function GET(req: Request) {
     });
 
     new UTApi().deleteFiles(
-      unusedMedia.map(
-        (m) =>
-          m.url.split(
-            `/a/${process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID ?? process.env.UPLOADTHING_APP_ID}/`,
-          )[1],
-      ),
+      unusedMedia
+        .map((m) => {
+          try {
+            return new URL(m.url).pathname.split("/").filter(Boolean).at(-1);
+          } catch {
+            return m.url.split("/").filter(Boolean).at(-1);
+          }
+        })
+        .filter((key): key is string => Boolean(key)),
     );
 
     await prisma.media.deleteMany({
