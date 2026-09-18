@@ -4,6 +4,8 @@ import MenuBar from "./MenuBar";
 import Navbar from "./Navbar";
 import SessionProvider from "./SessionProvider";
 
+export const dynamic = "force-dynamic";
+
 export default async function Layout({
   children,
 }: {
