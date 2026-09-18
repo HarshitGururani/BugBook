@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const utAppId = process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID;
+
 const nextConfig = {
   experimental: {
     staleTimes: {
@@ -11,8 +13,27 @@ const nextConfig = {
       {
         protocol: "https",
         hostname: "utfs.io",
-        pathname: `/a/${process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID}/*`,
+        pathname: "/a/**",
       },
+      {
+        protocol: "https",
+        hostname: "utfs.io",
+        pathname: "/f/**",
+      },
+      {
+        protocol: "https",
+        hostname: "*.ufs.sh",
+        pathname: "/f/**",
+      },
+      ...(utAppId
+        ? [
+            {
+              protocol: "https",
+              hostname: `${utAppId}.ufs.sh`,
+              pathname: "/f/**",
+            },
+          ]
+        : []),
     ],
   },
   rewrites: () => {
