@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
-const utAppId = process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID;
+const utAppId =
+  process.env.NEXT_PUBLIC_UPLOADTHING_APP_ID ?? process.env.UPLOADTHING_APP_ID;
 
 const nextConfig = {
   experimental: {
